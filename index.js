@@ -84,6 +84,9 @@ app.put('/calc/:x', (request, response) => {
 app.delete('/calc/:x', (request, response) => {
   response.send('x / y = ' + Math.round(request.params.x / request.body.y))
 })
+app.post('/calcl/:y', (request, response) => {
+  response.send('x * y = ' + (request.params.y * request.body.x))
+})
 
 app.listen(3210, myFunction()) //callback
 
