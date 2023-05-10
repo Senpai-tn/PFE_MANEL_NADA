@@ -86,7 +86,3 @@ app.delete('/calc/:x', (request, response) => {
 })
 
 app.listen(3210, myFunction()) //callback
-
-// callback
-// await
-// promise
