@@ -88,6 +88,17 @@ app.post('/calcl/:y', (request, response) => {
   response.send('x * y = ' + (request.params.y * request.body.x))
 })
 
+app.get('/premieres-lettres/:mot', (request, response) => {
+  response.send(`Les quatre premières lettres sont : ` + (request.params.mot , request.query.mot.slice(0, 4)) )
+});
+app.post('/dernieres-lettres/:mot', (request, response) => {
+  response.send(`Les quatre dérinieres lettres sont : ` + (request.params.mot , request.body.mot.slice(-4)) )
+});
+app.put('/sommes-lettres/:mot', (request, response) => {
+  response.send(`La somme : ` + (request.params.mot , request.body.mot.slice(0,4)+request.body.mot.slice(-4)) )
+});
+
+
 app.listen(3210, myFunction()) //callback
 
 // callback
