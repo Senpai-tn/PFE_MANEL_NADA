@@ -1,5 +1,5 @@
 const express = require('express')
-const { User, userSchema } = require('../models/user')
+const { User } = require('../models')
 const dayjs = require('dayjs')
 const mongoose = require('mongoose')
 const router = express.Router()
@@ -14,8 +14,8 @@ router.post('/', async (req, res) => {
     tel,
     cin,
     role,
-    idTruck,
-    idChauffeur,
+    listeCamions,
+    listeChauffeurs,
     categorie,
     adresse,
     listeCommandes,
@@ -31,13 +31,13 @@ router.post('/', async (req, res) => {
     role,
   })
   if (role === 'FOURNISSEUR') {
-    user.listeCamions && user.listeCamions.push(idTruck)
-    user.listeChauffeurs && user.listeChauffeurs.push(idChauffeur)
+    user.listeCamions && (user.listeCamions = listeCamions)
+    user.listeChauffeurs && (user.listeChauffeurs = listeChauffeurs)
     user.categorie = categorie
     user.adresse = adresse
     user.listeCommandes = undefined
   } else if (role === 'PLANIFICATEUR') {
-    user.listeCommandes = [idChauffeur]
+    user.listeCommandes = listeCommandes
     user.listeChauffeurs = undefined
     user.listeCamions = undefined
     user.categorie = undefined
@@ -69,7 +69,6 @@ router.post('/', async (req, res) => {
 router.get('/', async (req, res) => {
   const { email, password } = req.query
   const user = await User.findOne({ email: email }).populate('listeCamions')
-  console.log(user)
   if (user !== null) {
     if (user.password === password) {
       if (user.deletedAt === null) {
@@ -94,6 +93,11 @@ router.put('/', async (req, res) => {
       cin,
       deletedAt,
       blocked,
+      listeCamions,
+      listeChauffeurs,
+      categorie,
+      adresse,
+      listeCommandes,
     } = req.body
     const user = await User.findById(id)
     user.firstName = firstName || user.firstName
@@ -104,15 +108,41 @@ router.put('/', async (req, res) => {
     user.cin = cin || user.cin
     user.deletedAt = deletedAt || user.deletedAt
     user.blocked = blocked || user.blocked
+    if (user.role === 'FOURNISSEUR') {
+      user.listeCamions &&
+        (user.listeCamions = listeCamions || user.listeCamions)
+      user.listeChauffeurs &&
+        (user.listeChauffeurs = listeChauffeurs || user.listeChauffeurs)
+      user.categorie = categorie || user.categorie
+      user.adresse = adresse || user.adresse
+      user.listeCommandes = undefined
+    } else if (user.role === 'PLANIFICATEUR') {
+      user.listeCommandes = listeCommandes || user.listeCommandes
+      user.listeChauffeurs = undefined
+      user.listeCamions = undefined
+      user.categorie = undefined
+      user.adresse = undefined
+    } else {
+      user.listeCommandes = undefined
+      user.listeChauffeurs = undefined
+      user.listeCamions = undefined
+      user.categorie = undefined
+      user.adresse = undefined
+    }
     await user
       .save()
-      .then((savedUser) => {
-        res.status(200).send(savedUser)
+      .then(async (savedUser) => {
+        const clone = await User.findById(savedUser._id)
+          .populate('listeChauffeurs')
+          .populate('listeCamions')
+        res.status(200).send(clone)
       })
       .catch((error) => {
         res.status(500).send(error.message)
       })
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).send(error.message)
+  }
 })
 
 module.exports = router

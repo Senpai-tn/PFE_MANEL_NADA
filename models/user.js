@@ -7,7 +7,7 @@ const userSchema = new Schema(
     lastName: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true },
-
+    tel: { type: String, required: true },
     cin: { type: String, required: true },
     role: {
       type: String,
@@ -30,7 +30,7 @@ const userSchema = new Schema(
       default: undefined,
     },
     listeCommandes: {
-      type: [{ type: Schema.Types.ObjectId, ref: 'user' }],
+      type: [{ type: Schema.Types.ObjectId, ref: 'commande' }],
       default: undefined,
     },
     categorie: { type: String, default: undefined },
@@ -44,4 +44,4 @@ const userSchema = new Schema(
 
 const User = model('user', userSchema)
 
-module.exports = { User, userSchema }
+module.exports = User

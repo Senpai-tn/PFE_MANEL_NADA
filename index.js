@@ -179,14 +179,16 @@
 // app.listen(3210, myFunction()) //callback
 
 const express = require('express')
+const cors = require('cors')
 const { connect } = require('mongoose')
-const userRouter = require('./controllers/user')
-const truckRouter = require('./controllers/truck')
+const { truckRouter, commandeRouter, userRouter } = require('./controllers')
 const app = express()
 const port = 3120
 app.use(express.json())
+app.use(cors())
 app.use('/user', userRouter)
 app.use('/truck', truckRouter)
+app.use('/commande', commandeRouter)
 
 connect('mongodb://127.0.0.1:27017/PFE_MANEL_NADA', {})
   .then(() => {
