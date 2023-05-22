@@ -9,6 +9,7 @@ const userSchema = new Schema(
     password: { type: String, required: true },
     tel: { type: String, required: true },
     cin: { type: String, required: true },
+    matricule: { type: String, required: true },
     role: {
       type: String,
       enum: [

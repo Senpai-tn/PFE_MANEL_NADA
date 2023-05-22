@@ -14,6 +14,7 @@ router.post('/', async (req, res) => {
     tel,
     cin,
     role,
+    matricule,
     listeCamions,
     listeChauffeurs,
     categorie,
@@ -36,8 +37,10 @@ router.post('/', async (req, res) => {
     user.categorie = categorie
     user.adresse = adresse
     user.listeCommandes = undefined
+    user.matricule = undefined
   } else if (role === 'PLANIFICATEUR') {
     user.listeCommandes = listeCommandes
+    user.matricule = matricule
     user.listeChauffeurs = undefined
     user.listeCamions = undefined
     user.categorie = undefined
@@ -48,6 +51,7 @@ router.post('/', async (req, res) => {
     user.listeCamions = undefined
     user.categorie = undefined
     user.adresse = undefined
+    user.matricule = undefined
   }
 
   await user
@@ -68,7 +72,10 @@ router.post('/', async (req, res) => {
 //login
 router.get('/', async (req, res) => {
   const { email, password } = req.query
-  const user = await User.findOne({ email: email }).populate('listeCamions')
+  const user = await User.findOne({ email: email })
+    .populate('listeCamions')
+    .populate('listeChauffeurs')
+    .populate('listeCommandes')
   if (user !== null) {
     if (user.password === password) {
       if (user.deletedAt === null) {
@@ -143,6 +150,26 @@ router.put('/', async (req, res) => {
   } catch (error) {
     res.status(500).send(error.message)
   }
+})
+
+router.get('/search', async (req, res) => {
+  const { firstName, lastName, email, tel, cin, matricule, role, categorie } =
+    req.query
+  const users = await User.find({
+    firstName,
+    lastName,
+    email,
+    tel,
+    cin,
+    matricule,
+    role,
+    categorie,
+    deletedAt: null,
+  })
+    .populate('listeCamions')
+    .populate('listeChauffeurs')
+    .populate('listeCommandes')
+  res.send(users)
 })
 
 module.exports = router
