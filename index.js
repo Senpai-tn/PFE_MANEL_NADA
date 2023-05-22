@@ -190,7 +190,10 @@ app.use('/user', userRouter)
 app.use('/truck', truckRouter)
 app.use('/commande', commandeRouter)
 
-connect('mongodb://127.0.0.1:27017/PFE_MANEL_NADA', {})
+connect(
+  'mongodb+srv://user18:arwxcjkytqQegca6@cluster0.aykhi.mongodb.net/PFE_MANEL_NADA?authMechanism=DEFAULT',
+  {}
+)
   .then(() => {
     console.log('Connected to DB')
   })
