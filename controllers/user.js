@@ -153,19 +153,7 @@ router.put('/', async (req, res) => {
 })
 
 router.get('/search', async (req, res) => {
-  const { firstName, lastName, email, tel, cin, matricule, role, categorie } =
-    req.query
-  const users = await User.find({
-    firstName,
-    lastName,
-    email,
-    tel,
-    cin,
-    matricule,
-    role,
-    categorie,
-    deletedAt: null,
-  })
+  const users = await User.find({ ...req.query, deletedAt: null })
     .populate('listeCamions')
     .populate('listeChauffeurs')
     .populate('listeCommandes')
