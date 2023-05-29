@@ -174,16 +174,22 @@ router.post('/chauffeur', async (req, res) => {
   })
   user.save().then(async (savedUser) => {
     const fournisseur = await User.findById(idFournisseur)
-    fournisseur.listeChauffeurs = fournisseur.listeChauffeurs
-      ? fournisseur.listeChauffeurs.push(savedUser._id)
-      : [savedUser._id]
-    fournisseur.save().then(async () => {
-      const clone = await User.findById(fournisseur._id)
-        .populate('listeCamions')
-        .populate('listeChauffeurs')
-        .populate('listeCommandes')
-      res.status(200).send(clone)
-    })
+    if (fournisseur.listeChauffeurs) {
+      fournisseur.listeChauffeurs.push(savedUser._id)
+    } else fournisseur.listeChauffeurs = [savedUser._id]
+    fournisseur
+      .save()
+      .then(async () => {
+        const clone = await User.findById(fournisseur._id)
+          .populate('listeCamions')
+          .populate('listeChauffeurs')
+          .populate('listeCommandes')
+        res.status(200).send(clone)
+      })
+      .catch((error) => {
+        console.log(error)
+        res.status(500).send(error)
+      })
   })
 })
 
