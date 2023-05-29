@@ -160,4 +160,31 @@ router.get('/search', async (req, res) => {
   res.send(users)
 })
 
+router.post('/chauffeur', async (req, res) => {
+  const { idFournisseur, firstName, lastName, email, password, tel, cin } =
+    req.body
+  const user = new User({
+    firstName,
+    lastName,
+    email,
+    password,
+    tel,
+    cin,
+    role: 'CHAUFFEUR',
+  })
+  user.save().then(async (savedUser) => {
+    const fournisseur = await User.findById(idFournisseur)
+    fournisseur.listeChauffeurs = fournisseur.listeChauffeurs
+      ? fournisseur.listeChauffeurs.push(savedUser._id)
+      : [savedUser._id]
+    fournisseur.save().then(async () => {
+      const clone = await User.findById(fournisseur._id)
+        .populate('listeCamions')
+        .populate('listeChauffeurs')
+        .populate('listeCommandes')
+      res.status(200).send(clone)
+    })
+  })
+})
+
 module.exports = router

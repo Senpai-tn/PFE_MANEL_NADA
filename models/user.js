@@ -2,13 +2,12 @@ const { Schema, model } = require('mongoose')
 
 const userSchema = new Schema(
   {
-    //instanciation
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true },
     tel: { type: String, required: true },
-    cin: { type: String, required: true },
+    cin: { type: String, unique: true },
     matricule: { type: String },
     role: {
       type: String,
@@ -44,5 +43,5 @@ const userSchema = new Schema(
 )
 
 const User = model('user', userSchema)
-
+User.createIndexes()
 module.exports = User

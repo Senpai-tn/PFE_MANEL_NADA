@@ -181,7 +181,12 @@
 const express = require('express')
 const cors = require('cors')
 const { connect } = require('mongoose')
-const { truckRouter, commandeRouter, userRouter } = require('./controllers')
+const {
+  truckRouter,
+  commandeRouter,
+  userRouter,
+  productRouter,
+} = require('./controllers')
 const app = express()
 const port = 3120
 app.use(express.json())
@@ -189,10 +194,10 @@ app.use(cors())
 app.use('/user', userRouter)
 app.use('/truck', truckRouter)
 app.use('/commande', commandeRouter)
+app.use('/product', productRouter)
 
 connect(
-  'mongodb+srv://user18:arwxcjkytqQegca6@cluster0.aykhi.mongodb.net/PFE_MANEL_NADA?authMechanism=DEFAULT',
-  {}
+  'mongodb+srv://user18:arwxcjkytqQegca6@cluster0.aykhi.mongodb.net/PFE_MANEL_NADA?authMechanism=DEFAULT'
 )
   .then(() => {
     console.log('Connected to DB')

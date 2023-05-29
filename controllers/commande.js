@@ -17,8 +17,10 @@ router.get('/', async (req, res) => {
 
 //ajouter
 router.post('/', async (req, res) => {
-  const { fournisseur, listProducts } = req.body
-  const commande = new Commande({ fournisseur, listProducts })
+  const { fournisseur, listProducts, date } = req.body
+  console.log(req.body)
+  const commande = new Commande({ listProducts, date })
+  commande.fournisseur = fournisseur
   await commande
     .save()
     .then(async (savedCommande) => {
