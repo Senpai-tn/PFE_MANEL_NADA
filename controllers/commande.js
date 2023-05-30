@@ -37,10 +37,11 @@ router.post('/', async (req, res) => {
 //modifier + supprimer
 router.put('/', async (req, res) => {
   try {
-    const { id, fournisseur, listProducts } = req.body
+    const { id, fournisseur, listProducts, etat } = req.body
     const commande = await Commande.findById(id)
     commande.fournisseur = fournisseur || commande.fournisseur
     commande.listProducts = listProducts || commande.listProducts
+    commande.etat = etat || commande.etat
     commande.save().then(async (savedCommande) => {
       const clone = await Commande.findById(savedCommande._id)
         .populate('fournisseur')
