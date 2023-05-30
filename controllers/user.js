@@ -71,20 +71,25 @@ router.post('/', async (req, res) => {
 
 //login
 router.get('/', async (req, res) => {
-  const { email, password } = req.query
-  const user = await User.findOne({ email: email })
-    .populate('listeCamions')
-    .populate('listeChauffeurs')
-    .populate('listeCommandes')
-  if (user !== null) {
-    if (user.password === password) {
-      if (user.deletedAt === null) {
-        if (dayjs(user.blocked) < dayjs() || user.blocked === null) {
-          res.status(200).send(user)
-        } else res.status(401).send('user blocked')
-      } else res.status(402).send('user deleted')
-    } else res.status(403).send('password error')
-  } else res.status(404).send('not found')
+  try {
+    const { email, password } = req.query
+    const user = await User.findOne({ email: email })
+      .populate('listeCamions')
+      .populate('listeChauffeurs')
+      .populate('listeCommandes')
+
+    if (user !== null) {
+      if (user.password === password) {
+        if (user.deletedAt === null) {
+          if (dayjs(user.blocked) < dayjs() || user.blocked === null) {
+            res.status(200).send(user)
+          } else res.status(401).send('user blocked')
+        } else res.status(402).send('user deleted')
+      } else res.status(403).send('password error')
+    } else res.status(404).send('not found')
+  } catch (error) {
+    res.status(500).send({ ...error })
+  }
 })
 
 //modifier + supprimer + bloquer
