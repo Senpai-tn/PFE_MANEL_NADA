@@ -186,6 +186,7 @@ const {
   commandeRouter,
   userRouter,
   productRouter,
+  livraisonRouter,
 } = require('./controllers')
 const app = express()
 const port = 3120
@@ -195,6 +196,7 @@ app.use('/user', userRouter)
 app.use('/truck', truckRouter)
 app.use('/commande', commandeRouter)
 app.use('/product', productRouter)
+app.use('/livraison', livraisonRouter)
 
 connect(
   'mongodb+srv://user18:arwxcjkytqQegca6@cluster0.aykhi.mongodb.net/PFE_MANEL_NADA?authMechanism=DEFAULT'
