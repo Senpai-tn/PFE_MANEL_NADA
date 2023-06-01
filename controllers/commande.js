@@ -17,21 +17,25 @@ router.get('/', async (req, res) => {
 
 //ajouter
 router.post('/', async (req, res) => {
-  const { fournisseur, listProducts, date } = req.body
-  console.log(req.body)
-  const commande = new Commande({ listProducts, date })
-  commande.fournisseur = fournisseur
-  await commande
-    .save()
-    .then(async (savedCommande) => {
-      const clone = await Commande.findById(savedCommande._id)
-        .populate('fournisseur')
-        .populate('listProducts.product')
-      res.status(200).send(clone)
-    })
-    .catch((error) => {
-      res.status(500).send(error.message)
-    })
+  try {
+    const { fournisseur, listProducts, date } = req.body
+    console.log(req.body)
+    const commande = new Commande({ listProducts, date })
+    commande.fournisseur = fournisseur
+    await commande
+      .save()
+      .then(async (savedCommande) => {
+        const clone = await Commande.findById(savedCommande._id)
+          .populate('fournisseur')
+          .populate('listProducts.product')
+        res.status(200).send(clone)
+      })
+      .catch((error) => {
+        res.status(500).send(error.message)
+      })
+  } catch (error) {
+    res.status(500).send(error.message)
+  }
 })
 
 //modifier + supprimer

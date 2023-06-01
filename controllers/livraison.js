@@ -46,19 +46,22 @@ router.get('/', async (req, res) => {
 })
 
 router.put('/', async (req, res) => {
-  const { id, entree, sortie } = req.body
-
-  const livraison = await Livraison.findById(id)
-  livraison.entree = entree ? entree : livraison.entree
-  livraison.sortie = sortie ? sortie : livraison.sortie
-  livraison
-    .save()
-    .then((savedLivraison) => {
-      res.send(savedLivraison)
-    })
-    .catch((error) => {
-      res.status(500).send(error)
-    })
+  try {
+    const { id, entree, sortie } = req.body
+    const livraison = await Livraison.findById(id)
+    livraison.entree = entree ? entree : livraison.entree
+    livraison.sortie = sortie ? sortie : livraison.sortie
+    livraison
+      .save()
+      .then((savedLivraison) => {
+        res.send(savedLivraison)
+      })
+      .catch((error) => {
+        res.status(500).send(error)
+      })
+  } catch (error) {
+    res.status(500).send(error)
+  }
 })
 
 module.exports = router

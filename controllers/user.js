@@ -6,67 +6,71 @@ const router = express.Router()
 
 //ajouter user
 router.post('/', async (req, res) => {
-  const {
-    firstName,
-    lastName,
-    email,
-    password,
-    tel,
-    cin,
-    role,
-    matricule,
-    listeCamions,
-    listeChauffeurs,
-    categorie,
-    adresse,
-    listeCommandes,
-  } = req.body
+  try {
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      tel,
+      cin,
+      role,
+      matricule,
+      listeCamions,
+      listeChauffeurs,
+      categorie,
+      adresse,
+      listeCommandes,
+    } = req.body
 
-  const user = new User({
-    firstName,
-    lastName,
-    email,
-    password,
-    tel,
-    cin,
-    role,
-  })
-  if (role === 'FOURNISSEUR') {
-    user.listeCamions && (user.listeCamions = listeCamions)
-    user.listeChauffeurs && (user.listeChauffeurs = listeChauffeurs)
-    user.categorie = categorie
-    user.adresse = adresse
-    user.listeCommandes = undefined
-    user.matricule = undefined
-  } else if (role === 'PLANIFICATEUR') {
-    user.listeCommandes = listeCommandes
-    user.matricule = matricule
-    user.listeChauffeurs = undefined
-    user.listeCamions = undefined
-    user.categorie = undefined
-    user.adresse = undefined
-  } else {
-    user.listeCommandes = undefined
-    user.listeChauffeurs = undefined
-    user.listeCamions = undefined
-    user.categorie = undefined
-    user.adresse = undefined
-    user.matricule = undefined
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      password,
+      tel,
+      cin,
+      role,
+    })
+    if (role === 'FOURNISSEUR') {
+      user.listeCamions && (user.listeCamions = listeCamions)
+      user.listeChauffeurs && (user.listeChauffeurs = listeChauffeurs)
+      user.categorie = categorie
+      user.adresse = adresse
+      user.listeCommandes = undefined
+      user.matricule = undefined
+    } else if (role === 'PLANIFICATEUR') {
+      user.listeCommandes = listeCommandes
+      user.matricule = matricule
+      user.listeChauffeurs = undefined
+      user.listeCamions = undefined
+      user.categorie = undefined
+      user.adresse = undefined
+    } else {
+      user.listeCommandes = undefined
+      user.listeChauffeurs = undefined
+      user.listeCamions = undefined
+      user.categorie = undefined
+      user.adresse = undefined
+      user.matricule = undefined
+    }
+
+    await user
+      .save()
+
+      .then(async (savedUser) => {
+        const clone = await User.findById(savedUser._id)
+          .populate('listeCamions')
+          .populate('listeChauffeurs')
+          .populate('listeCommandes')
+        res.status(200).send(clone)
+      })
+      .catch((error) => {
+        res.status(500).send(error.message)
+      })
+  } catch (error) {
+    res.status(500).send(error.message)
   }
-
-  await user
-    .save()
-
-    .then(async (savedUser) => {
-      const clone = await User.findById(savedUser._id)
-        .populate('listeCamions')
-        .populate('listeChauffeurs')
-        .populate('listeCommandes')
-      res.status(200).send(clone)
-    })
-    .catch((error) => {
-      res.status(500).send(error.message)
-    })
 })
 
 //login
@@ -158,44 +162,52 @@ router.put('/', async (req, res) => {
 })
 
 router.get('/search', async (req, res) => {
-  const users = await User.find({ ...req.query, deletedAt: null })
-    .populate('listeCamions')
-    .populate('listeChauffeurs')
-    .populate('listeCommandes')
-  res.send(users)
+  try {
+    const users = await User.find({ ...req.query, deletedAt: null })
+      .populate('listeCamions')
+      .populate('listeChauffeurs')
+      .populate('listeCommandes')
+    res.send(users)
+  } catch (error) {
+    res.status(500).send(error.message)
+  }
 })
 
 router.post('/chauffeur', async (req, res) => {
-  const { idFournisseur, firstName, lastName, email, password, tel, cin } =
-    req.body
-  const user = new User({
-    firstName,
-    lastName,
-    email,
-    password,
-    tel,
-    cin,
-    role: 'CHAUFFEUR',
-  })
-  user.save().then(async (savedUser) => {
-    const fournisseur = await User.findById(idFournisseur)
-    if (fournisseur.listeChauffeurs) {
-      fournisseur.listeChauffeurs.push(savedUser._id)
-    } else fournisseur.listeChauffeurs = [savedUser._id]
-    fournisseur
-      .save()
-      .then(async () => {
-        const clone = await User.findById(fournisseur._id)
-          .populate('listeCamions')
-          .populate('listeChauffeurs')
-          .populate('listeCommandes')
-        res.status(200).send(clone)
-      })
-      .catch((error) => {
-        console.log(error)
-        res.status(500).send(error)
-      })
-  })
+  try {
+    const { idFournisseur, firstName, lastName, email, password, tel, cin } =
+      req.body
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      password,
+      tel,
+      cin,
+      role: 'CHAUFFEUR',
+    })
+    user.save().then(async (savedUser) => {
+      const fournisseur = await User.findById(idFournisseur)
+      if (fournisseur.listeChauffeurs) {
+        fournisseur.listeChauffeurs.push(savedUser._id)
+      } else fournisseur.listeChauffeurs = [savedUser._id]
+      fournisseur
+        .save()
+        .then(async () => {
+          const clone = await User.findById(fournisseur._id)
+            .populate('listeCamions')
+            .populate('listeChauffeurs')
+            .populate('listeCommandes')
+          res.status(200).send(clone)
+        })
+        .catch((error) => {
+          console.log(error)
+          res.status(500).send(error)
+        })
+    })
+  } catch (error) {
+    res.status(500).send(error.message)
+  }
 })
 
 module.exports = router
