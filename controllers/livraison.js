@@ -64,4 +64,18 @@ router.put('/', async (req, res) => {
   }
 })
 
+router.get('/all', async (req, res) => {
+  try {
+    const livraisons = await Livraison.find()
+      .populate('chauffeur')
+      .populate('camion')
+      .populate('fournisseur')
+      .populate('listProducts.product')
+
+    res.send(livraisons)
+  } catch (error) {
+    console.log(error)
+  }
+})
+
 module.exports = router
