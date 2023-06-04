@@ -13,4 +13,20 @@ router.get('/', async (req, res) => {
   }
 })
 
+//modifier + supprimer
+router.put('/', async (req, res) => {
+  try {
+    const { id, name, categorie, deletedAt } = req.body
+    const produit = await Product.findById(id)
+    produit.categorie = categorie || produit.categorie
+    produit.name = name || produit.name
+    produit.deletedAt = deletedAt || produit.deletedAt
+    produit.save().then((savedProduit) => {
+      res.status(200).send(savedProduit)
+    })
+  } catch (error) {
+    res.status(500).send(error.message)
+  }
+})
+
 module.exports = router
