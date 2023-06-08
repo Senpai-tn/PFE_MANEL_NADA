@@ -23,7 +23,7 @@ router.post('/', async (req, res) => {
       listeCommandes,
     } = req.body
 
-    const search = await User.findOne({ email })
+    const search = await User.findOne({ $or: [{ email }, { cin }] })
     if (search) {
       res.status(400).send('email existe')
     } else {
