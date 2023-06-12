@@ -14,7 +14,7 @@ router.post('/', async (req, res) => {
       listProducts,
     })
     livraison.save().then((savedLivraison) => {
-      res.send(livraison)
+      res.send(savedLivraison)
     })
   } catch (error) {
     res.status(500).send(error)
